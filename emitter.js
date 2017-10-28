@@ -154,11 +154,11 @@ function handleEvent(event, indexRecipient) {
         recipient.counter = 0;
     }
     if (recipient.frequency) {
-        if (recipient.counter % recipient.frequency === 0) {
+        if (recipient.counter++ % recipient.frequency === 0) {
             recipient.handler.call(recipient.context);
         }
     } else if (recipient.times) {
-        if (recipient.times > recipient.counter) {
+        if (recipient.times > recipient.counter++) {
             recipient.handler.call(recipient.context);
         } else {
             this.recipientsOfEvents[event].splice(indexRecipient, 1);
@@ -166,7 +166,6 @@ function handleEvent(event, indexRecipient) {
     } else {
         recipient.handler.call(recipient.context);
     }
-    recipient.counter++;
 
     return this;
 }
