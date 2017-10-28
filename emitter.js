@@ -47,7 +47,7 @@ function getEmitter() {
          */
         off: function (event, context) {
             Object.keys(this.recipientsOfEvents).forEach(eventRecipients => {
-                if (eventRecipients === event || eventRecipients.indexOf(`${event}.`) !== -1) {
+                if (eventRecipients === event || eventRecipients.indexOf(`${event}.`) === 0) {
                     this.recipientsOfEvents[eventRecipients] =
                     this.recipientsOfEvents[eventRecipients]
                         .filter(recipient => recipient.context !== context);
