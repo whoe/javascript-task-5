@@ -47,10 +47,10 @@ function getEmitter() {
          */
         off: function (event, context) {
             Object.keys(this.recipientsOfEvents).forEach(eventRecipients => {
-                if (eventRecipients === event || eventRecipients.indexOf(`${event}.`) === 0) {
+                if (eventRecipients === event || eventRecipients.startsWith(`${event}.`)) {
                     this.recipientsOfEvents[eventRecipients] =
-                    this.recipientsOfEvents[eventRecipients]
-                        .filter(recipient => recipient.context !== context);
+                        this.recipientsOfEvents[eventRecipients]
+                            .filter(recipient => recipient.context !== context);
                 }
             });
 
@@ -145,7 +145,7 @@ function initRecipients(event) {
  * 
  * @this GetEmitter
  * @param {String} event 
- * @param {indexRecipient} indexRecipient
+ * @param {Number} indexRecipient
  * @returns {Object}
  */
 function handleEvent(event, indexRecipient) {
