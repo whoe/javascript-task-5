@@ -68,9 +68,9 @@ function getEmitter() {
                 if (!recipients) {
                     continue;
                 }
-                for (let indexRecipient of recipients.keys()) {
-                    handleEvent.call(this, event, indexRecipient);
-                }
+                recipients.forEach(recipient => {
+                    recipient.handler.call(recipient.context);
+                });
             } while ((event = getParentNamespace(event)));
 
             return this;
@@ -87,10 +87,14 @@ function getEmitter() {
          */
         several: function (event, context, handler, times) {
             initRecipients.call(this, event);
+            let counter = 0;
             this.recipientsOfEvents[event].push({
                 context,
-                handler,
-                times
+                handler: () => {
+                    if (counter++ < times) {
+                        handler.call(context);
+                    }
+                }
             });
 
             return this;
@@ -107,10 +111,14 @@ function getEmitter() {
          */
         through: function (event, context, handler, frequency) {
             initRecipients.call(this, event);
+            let counter = 0;
             this.recipientsOfEvents[event].push({
                 context,
-                handler,
-                frequency
+                handler: () => {
+                    if (counter++ % frequency === 0) {
+                        handler.call(context);
+                    }
+                }
             });
 
             return this;
@@ -138,34 +146,4 @@ function initRecipients(event) {
     if (this.recipientsOfEvents[event] === undefined) {
         this.recipientsOfEvents[event] = [];
     }
-}
-
-
-/**
- * 
- * @this GetEmitter
- * @param {String} event 
- * @param {Number} indexRecipient
- * @returns {Object}
- */
-function handleEvent(event, indexRecipient) {
-    let recipient = this.recipientsOfEvents[event][indexRecipient];
-    if (!recipient.counter) {
-        recipient.counter = 0;
-    }
-    if (recipient.frequency) {
-        if (recipient.counter++ % recipient.frequency === 0) {
-            recipient.handler.call(recipient.context);
-        }
-    } else if (recipient.times) {
-        if (recipient.times > recipient.counter++) {
-            recipient.handler.call(recipient.context);
-        } else {
-            this.recipientsOfEvents[event].splice(indexRecipient, 1);
-        }
-    } else {
-        recipient.handler.call(recipient.context);
-    }
-
-    return this;
 }
